@@ -80,8 +80,8 @@ $_ENV['random_group']              = '0';                       //注册时随�
 $_ENV['enable_reg_im']             = false;                      //注册时是否要求用户输入IM联系方式
 
 $_ENV['reg_forbidden_ip']          = '127.0.0.0/8,::1/128';     //注册时默认禁止访问IP列表，半角英文逗号分割
-$_ENV['min_port']                  = 10000;                     //用户端口池最小值
-$_ENV['max_port']                  = 65535;                     //用户端口池最大值
+$_ENV['min_port']                  = 10000;                     //用户端口池最小值，如果该数值为0则用户在注册的时候不会被分配多用户端口，适合纯V2Ray/Trojan机场
+$_ENV['max_port']                  = 65535;                     //用户端口池最大值，如果该数值为0则用户在注册的时候不会被分配多用户端口，适合纯V2Ray/Trojan机场
 $_ENV['reg_forbidden_port']        = '';                        //注册时默认禁止访问端口列表，半角英文逗号分割，支持端口段
 
 $_ENV['mu_suffix']                 = 'microsoft.com';           //单端口多用户混淆参数后缀，可以随意修改，但请保持前后端一致
@@ -200,11 +200,6 @@ $_ENV['telegram_request_token']             = '';           //Telegram 机器人
 $_ENV['finance_public']                     = true;         //财务报告是否向群公开
 $_ENV['enable_welcome_message']             = true;         //机器人发送欢迎消息
 
-# 图灵
-$_ENV['enable_tuling']                      = false;         //是否开启图灵机器人
-$_ENV['tuling_apikey']                      = '';            //图灵机器人API Key
-$_ENV['tuling_apisecert']                   = '';            //图灵机器人密钥
-
 # Telegram BOT 其他选项
 $_ENV['allow_to_join_new_groups']           = true;         //允许 Bot 加入下方配置之外的群组
 $_ENV['group_id_allowed_to_join']           = [];           //允许加入的群组 ID，格式为 PHP 数组
@@ -290,49 +285,57 @@ $_ENV['enable_checkin_captcha'] = false;        //启用签到验证码
 
 
 //支付系统设置----------------------------------------------------------------------------------------
-#取值 none | codepay | f2fpay | paymentwall | spay | payjs | yftpay | bitpayx
-$_ENV['payment_system']       = 'none';
+#取值 none | f2fpay | paymentwall | spay | payjs | bitpayx | theadpay | coinpay
+$_ENV['payment_system']       = 'none';     // todo: ['gateway1', 'gateway2']
 
-#yft支付设置
-$_ENV['yft_secret']           = '';
-$_ENV['yft_accesskey']        = '';
-
-#codepay码支付
-#wiki地址:https://goo.gl/dRwRDi  http://t.cn/RnsWjtB
+# codepay码支付
 $_ENV['codepay_id']           = '';          //码支付ID
 $_ENV['codepay_key']          = '';          //码支付通信密钥
 
-#alipay,f2fpay
+# alipay,f2fpay
 $_ENV['f2fpay_app_id']        = '';
 $_ENV['f2fpay_p_id']          = '';
 $_ENV['alipay_public_key']    = '';
 $_ENV['merchant_private_key'] = '';
 $_ENV['f2fNotifyUrl']         = null;           //自定义当面付回调地址
 
-#PaymentWall
+# PaymentWall
 $_ENV['pmw_publickey']        = '';
 $_ENV['pmw_privatekey']       = '';
 $_ENV['pmw_widget']           = 'm2_1';
 $_ENV['pmw_height']           = '350px';
 
-#alipay,spay
+# alipay,spay
 $_ENV['alipay_id']            = '';
 $_ENV['alipay_key']           = '';
 $_ENV['amount']               = [2, 23, 233, 2333, 23333];        //充值金额选项设定
 
-#alipay,zfbjk.com
+# alipay,zfbjk.com
 $_ENV['zfbjk_pid']            = '';
 $_ENV['zfbjk_key']            = '';
 $_ENV['zfbjk_qrcodeurl']      = '';
 
-# MugglePay 麻瓜宝（USDT、比特币、以太坊、EOS等） 商户后台获取授权码 https://merchants.mugglepay.com/
-#   注册即可使用USDT收款，无需任何费用
-#   客服和技术 24x7 在线支持： https://t.me/mugglepay
+# MugglePay 麻瓜宝（USDT、比特币、以太坊、EOS等） https://merchants.mugglepay.com/
 $_ENV['bitpay_secret']        = '';
 
-#PayJs
+# PayJs
 $_ENV['payjs_mchid']          = '';
 $_ENV['payjs_key']            = '';
+
+# 平头哥支付 https://theadpay.com/
+$_ENV['theadpay_url']         = '';
+$_ENV['theadpay_mchid']       = '';
+$_ENV['theadpay_key']         = '';
+
+# CoinPay
+$_ENV['coinpay_appid']  ='';	// CoinPay 应用ID (*)
+$_ENV['coinpay_secret'] ='';	// CoinPay 验证密钥 (*)
+$_ENV['coinpay_notify'] ='';    // 异步回调URL
+$_ENV['coinpay_return'] ='';    // 同步返回URL
+
+# EasyPay https://t.me/Easy_panel
+$_ENV['easypay_app_id'] = '';      // 商户APPID
+$_ENV['easypay_app_secret'] = '';  // 商户APPKEY
 
 #后台商品列表 销量统计
 $_ENV['sales_period']         = 30;             //统计指定周期内的销量，值为【expire/任意大于0的整数】
@@ -426,11 +429,11 @@ $_ENV['userCenterClient']     = [
 
 //节点检测-----------------------------------------------------------------------------------------------
 #GFW检测，请通过crontab进行【开启/关闭】
-$_ENV['detect_gfw_interval']             = 3600;                                                //检测间隔，单位：秒，低于推荐值会爆炸
-$_ENV['detect_gfw_port']                 = 22;                                                  //所有节点服务器都打开的TCP端口，常用的为22（SSH端口）
-$_ENV['detect_gfw_url']                  = 'https://cn-qz-tcping.torch.njs.app/{ip}/{port}';    //检测节点是否被gfw墙了的API的URL
-$_ENV['detect_gfw_judge']                = '$json_tcping[\'status\']=="true"';                  //判断是否被墙的依据，json_tcping为上方URL返回的json数组
-$_ENV['detect_gfw_count']                = '3';                                                 //尝试次数
+$_ENV['detect_gfw_interval']             = 3600;                                                               //检测间隔，单位：秒，低于推荐值会爆炸
+$_ENV['detect_gfw_port']                 = 22;                                                                 //所有节点服务器都打开的TCP端口，常用的为22（SSH端口）
+$_ENV['detect_gfw_url']                  = 'http://cn-sh-tcping.sspanel.org:8080/tcping?ip={ip}&port={port}'; //检测节点是否被gfw墙了的API的URL
+$_ENV['detect_gfw_judge']                = '$json_tcping[\'status\']=="true"';                                 //判断是否被墙的依据，json_tcping为上方URL返回的json数组
+$_ENV['detect_gfw_count']                = '3';                                                                //尝试次数
 
 #离线检测
 $_ENV['enable_detect_offline']           = true;
@@ -478,7 +481,6 @@ $_ENV['cloudflare_name']        = '';            //域名
 
 #是否夹带统计代码，自己在 resources/views/{主题名} 下创建一个 analytics.tpl ，如果有必要就用 literal 界定符
 $_ENV['enable_analytics_code']  = false;
-$_ENV['sspanelAnalysis']        = true;
 
 #在套了CDN之后获取用户真实ip，如果您不知道这是什么，请不要乱动
 $_ENV['cdn_forwarded_ip'] = array('HTTP_X_FORWARDED_FOR', 'HTTP_ALI_CDN_REAL_IP', 'X-Real-IP', 'True-Client-Ip');
@@ -492,3 +494,8 @@ foreach ($_ENV['cdn_forwarded_ip'] as $cdn_forwarded_ip) {
 
 // https://sentry.io for production debugging
 $_ENV['sentry_dsn'] = '';
+
+// ClientDownload 命令解决 API 访问频率高而被限制使用的 Github access token
+$_ENV['github_access_token'] = '';
+
+$_ENV['php_user_group'] = 'www:www';
